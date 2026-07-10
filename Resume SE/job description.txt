@@ -1,0 +1,13 @@
+**Overview:**
+We are seeking a passionate Sr Full Stack Engineer to join our onsite team located at Huntersville. We follow kanban-scrum development and you will be involved in design, development, deployment, and maintenance of new and existing platform features. If you are someone that is passionate to write clean and functional code on the front- and back-end; to create a great user experience, while ensuring code quality with automated and functional testing along with peer review. The platform has 50+ CRM, SaaS, API integrations, and we add more each sprint.
+
+**Qualifications:**
+• Experience working with large scale applications writing clean/reliable code and agile methodologies
+• Hands on experience in React, Node, SQL database
+• Build and Manage 3rd party APIs to build integrations
+• Support, manage and troubleshoot applications in production as needed
+• Working experience with Cloud providers, CD/CI automation and DevOps management
+• Comfortable to communicate and engage with client technology team
+• Self-motivated with a strong sense of ownership, urgency and drive
+• Work well with team members located in the office and remote locations
+• Mentor other team members and conduct tech debt review
