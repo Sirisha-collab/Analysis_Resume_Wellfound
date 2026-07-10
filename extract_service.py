@@ -12,6 +12,8 @@ from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from constants import SDR_SKILLS
+
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
@@ -28,33 +30,6 @@ nlp = spacy.load("en_core_web_lg")
 embedding_model = SentenceTransformer(
     "sentence-transformers/all-MiniLM-L6-v2"
 )
-
-# =====================================================
-# SKILLS
-# =====================================================
-
-SDR_SKILLS = [
-    "cold calling",
-    "cold outreach",
-    "prospecting",
-    "lead generation",
-    "sales pipeline",
-    "sales funnel",
-    "appointment setting",
-    "outbound sales",
-    "sales",
-    "b2b",
-    "business development",
-    "client communication",
-    "marketing",
-    "communication",
-    "salesforce",
-    "hubspot",
-    "zoho",
-    "apollo",
-    "linkedin sales navigator",
-    "crm"
-]
 
 # =====================================================
 # EXTRACTORS
@@ -152,8 +127,6 @@ def extract_companies(text):
 # =====================================================
 # EXPERIENCE
 # =====================================================
-
-
 def parse_date(date_str):
 
     date_str = date_str.lower().strip()
@@ -415,44 +388,25 @@ def main():
             "LinkedIn": extract_linkedin(text),
             "GitHub": extract_github(text),
             "RawText": text
-
         })
 
     # Candidate Repo
+    candidate_df = pd.DataFrame(results)
 
-    candidate_df = pd.DataFrame(
-        results
-    )
+    timestamp = datetime.now().strftime( "%Y%m%d_%H%M%S" )
 
-    timestamp = datetime.now().strftime(
-        "%Y%m%d_%H%M%S"
-    )
+    repo_file = (f"candidate_repo_{timestamp}.xlsx") 
 
-    repo_file = (
-        f"candidate_repo_{timestamp}.xlsx"
-    )
-
-    candidate_df.to_excel(
-        repo_file,
-        index=False
-    )
+    candidate_df.to_excel(repo_file, index=False)
 
     style_excel(repo_file)
-
-    print(
-        f"Candidate Repo Saved: {repo_file}"
-    )
+    print(f"Candidate Repo Saved: {repo_file}")
 
     # Ranking
-
     ranked = []
-
     for r in results:
 
-        score, reason = score_candidate(
-            r,
-            job_embedding
-        )
+        score, reason = score_candidate(r,job_embedding)
 
         if score < 0:
             continue
@@ -468,24 +422,15 @@ def main():
         reverse=True
     )[:5]
 
-    top5_df = pd.DataFrame(
-        top5
-    )
+    top5_df = pd.DataFrame(top5)
 
-    top5_file = (
-        f"SDR_top_5_{timestamp}.xlsx"
-    )
+    top5_file = (f"SDR_top_5_{timestamp}.xlsx")
 
-    top5_df.to_excel(
-        top5_file,
-        index=False
-    )
+    top5_df.to_excel(top5_file, index=False)
 
     style_excel(top5_file)
 
-    print(
-        f"Top 5 Saved: {top5_file}"
-    )
+    print(f"Top 5 Saved: {top5_file}")
 
 
 if __name__ == "__main__":

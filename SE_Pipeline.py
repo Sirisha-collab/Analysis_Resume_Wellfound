@@ -12,6 +12,8 @@ from extract_service import (
      extract_linkedin, extract_github,create_embedding
 )      
 
+from constants import SE_SKILLS, REQUIRED_BACKEND, REQUIRED_FRONTEND, HIGH, MEDIUM, PENALTIES, NEGATIVE
+
 from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -63,31 +65,6 @@ with open(JOB_DESCRIPTION_FILE, "r", encoding="utf-8") as f:
 
 job_embedding = create_embedding(job_description)
 
-SE_SKILLS = [
-"full stack development",
-"react",
-"node.js",
-"sql",
-"Typescript",
-"rest api development",
-"AWS",
-"saas integrations",
-"Azure",
-"agile methodologies",
-"postgresql",
-"ci/cd pipelines",
-"devops",
-"cloud",
-"express.js",
-"sql",
-"linux",
-"integration testing",
-"code review",
-"git version control",
-"performance optimization",
-"Redis"
-]
-
 #exp into 3.5 instead of 3,
 def safe_exp(val):
     try:
@@ -133,120 +110,8 @@ def extract_metrics(row):
     return any(re.search(p, text) for p in patterns)
 
 
-#GITHUB QUALITY EVALUATION
-# def evaluate_github_quality(r):
-#     score = 0
-#     reasons = []
-
-#     repos = r.get("github_repos") or []
-#     commits = r.get("github_commit_count", 0)
-
-#     if not repos:
-#         return -30, ["No GitHub repositories found"]
-
-#     original_repos = [
-#         repo for repo in repos
-#         if not repo.get("fork", False)
-#     ]
-
-#     fork_ratio = 1 - (len(original_repos) / len(repos))
-
-#     if fork_ratio > 0.70:
-#         score -= 40
-#         reasons.append("Mostly forked repositories (-40)")
-#     else:
-#         score += 10
-#         reasons.append("Original repositories (+10)")
-
-#     if commits < 20:
-#         score -= 40
-#         reasons.append("Low GitHub activity (-40)")
-
-#     elif commits >= 100:
-#         score += 20
-#         reasons.append("Strong GitHub activity (+20)")
-
-#     else:
-#         score += 10
-#         reasons.append("Some GitHub activity (+10)")
-
-#     copy_words = [
-#         "tutorial",
-#         "course",
-#         "clone",
-#         "starter",
-#         "boilerplate",
-#         "assignment",
-#         "udemy",
-#         "youtube"
-#     ]
-
-#     copy_projects = 0
-
-#     for repo in repos:
-#         text = (
-#             str(repo.get("name", "")) +
-#             str(repo.get("description", "")) +
-#             str(repo.get("readme", ""))
-#         ).lower()
-
-#         if any(word in text for word in copy_words):
-#             copy_projects += 1
-
-
-#     if copy_projects >= 2:
-#         score -= 30
-#         reasons.append("Possible tutorial/copy projects (-30)")
-
-#     engineering_terms = [
-#         "docker",
-#         "docker-compose",
-#         "redis",
-#         "postgres",
-#         "postgresql",
-#         "mongodb",
-#         "authentication",
-#         "oauth",
-#         "jwt",
-#         "testing",
-#         "pytest",
-#         "jest",
-#         "github actions",
-#         "ci/cd",
-#         "kubernetes",
-#         "queue",
-#         "microservice",
-#         "api"
-#     ]
-
-#     github_text = " ".join(
-#         [
-#             str(repo.get("description", "")) +
-#             str(repo.get("readme", ""))
-#             for repo in repos
-#         ]
-#     ).lower()
-
-
-#     depth_matches = sum(
-#         1 for term in engineering_terms
-#         if term in github_text
-#     )
-
-
-#     if depth_matches >= 5:
-#         score += 20
-#         reasons.append("Good engineering depth (+20)")
-
-#     elif depth_matches == 0:
-#         score -= 15
-#         reasons.append("No technical depth found (-15)")
-
-
-#     return score, reasons
-
 # -----------------------------
-# SOFTWARE ENGINEER SCORING
+# SCORING
 # -----------------------------
 def score_candidate(r):
     score = 0
@@ -277,66 +142,7 @@ def score_candidate(r):
     elif exp > 8:
         score += 5
 
-    HIGH = [
-        "nodejs", "node.js",
-        "react",
-        "typescript",
-        "javascript",
-        "express",
-        "nextjs",
-        "next.js",
-        "aws",
-        "redis"
-    ]
-
-    MEDIUM = [
-        "postgresql",
-        "sql",
-        "graphql",
-        "rest api",
-        "restful api",
-        "git",
-        "system design"
-    ]
-
-    PENALTIES = {
-    "ai": -40,
-    "artificial intelligence": -40,
-    "blockchain": -40,
-    "html": -40,
-    "css": -40,
-    "docker": -40,
-    "java": -40,
-    ".net": -40,
-    "kubernetes": -40,
-    "bootstrap": -30,
-    "php": -20
-}
     
-    REQUIRED_BACKEND = [
-        "nodejs",
-        "node.js",
-        "python",
-        "java",
-        "golang",
-        "express"
-    ]
-
-    REQUIRED_FRONTEND = [
-        "react",
-        "javascript",
-        "typescript"
-    ]
-
-    NEGATIVE = [
-        "sales",
-        "marketing",
-        "sdr",
-        "cold calling",
-        "lead generation",
-        "public relations",
-        "seo"
-    ]
     negative_skills =[]
 
     has_backend = any(x in skills_text for x in REQUIRED_BACKEND)
@@ -407,46 +213,6 @@ def score_candidate(r):
             negative_reason = " | Negative skills: " + ", ".join(negative_skills)
     
     return score, "; ".join(reasons), ", ".join(negative_skills)
-
-#######################
-# from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-# import time
-
-# options = webdriver.ChromeOptions()
-# options.add_argument(r"user-data-dir=C:\selenium_profile")
-# options.add_argument("--profile-directory=Default")
-# options.add_argument("--no-sandbox")
-# options.add_argument("--disable-blink-features=AutomationControlled")
-# options.add_experimental_option("excludeSwitches", ["enable-automation"])
-# options.add_experimental_option('useAutomationExtension', False)
-
-# driver = webdriver.Chrome(options=options)
-
-# url = "https://wellfound.com/link/15163639/615eab389771dd8d67c5495980563961/github_url"
-
-# try:
-#     driver.get(url)
-#     time.sleep(3)
-    
-#     # Check if access is restricted
-#     page_source = driver.page_source
-#     if "access restricted" in page_source.lower():
-#         print("❌ Access Restricted - Session not valid")
-#         print("Try: Open Chrome manually, go to that Wellfound link and copy redirected URL")
-#         # Print page content to debug
-#         print(driver.current_url)
-#         print(page_source[:500])
-#     else:
-#         # Wait for redirect
-#         WebDriverWait(driver, 10).until(lambda d: d.current_url != url)
-#         github_url = driver.current_url
-#         print(github_url)
-        
-# finally:
-#     driver.quit()
 
 # -----------------------------
 # CSV ONLY PIPELINE
@@ -552,75 +318,7 @@ style_excel(top50_file)
 
 print("Top 50 saved:", top50_file)
 
-# # -----------------------------
-# # PIPELINE
-# # -----------------------------
-# all_candidates = []
-# ranked_candidates = []
-
-# files = os.listdir(RESUME_FOLDER)
-# print(f"Total files found: {len(files)}")
-
-# for file in files:
-
-#     if file.startswith("."):
-#         continue
-
-#     if not file.lower().endswith((".pdf", ".docx", ".csv")):
-#         continue
-
-#     path = os.path.join(RESUME_FOLDER, file)
-
-#     try:
-#         if file.lower().endswith(".pdf"):
-#             text = read_pdf(path)
-#         elif file.lower().endswith(".docx"):
-#             text = read_docx(path)
-#         elif file.lower().endswith(".csv"):
-#             text = read_csv(path)
-#         else:
-#             continue
-#     except Exception as e:
-#         print(f"Error reading {file}: {e}")
-#         continue
-
-#     if not text or len(text.strip()) < 50:
-#         continue
-
-#     exp = safe_exp(compute_years_experience_in_role(text))
-
-#     row = {
-#         "File": file,
-#         "name": extract_name(text),
-#         "Email": extract_email(text),
-#         "Phone": extract_phone(text),
-#         "location_city": extract_location(text),
-#         "years_experience_in_role (Years)": exp,
-#         "Skills": extract_skills(text),
-#         "LinkedIn": extract_linkedin(text),
-#         "GitHub": extract_github(text)
-#     }
-
-#     all_candidates.append(row)
-
-#     if exp < 1:
-#         continue
-
-#     score, reason = score_candidate(row)
-
-#     if score < 0:
-#         continue
-
-#     row["Score"] = score
-#     row["Score Breakdown"] = reason
-
-#     ranked_candidates.append(row)
-
-
-# -----------------------------
-# EXPORT
-# -----------------------------
-
+#Export candidate repo
 SE_DIR = "SE_results"
 os.makedirs(SE_DIR, exist_ok=True)
 
@@ -637,7 +335,7 @@ style_excel(repo_file)
 
 print(" SE Candidate repo saved:", repo_file)
 
-
+#Export top 5 candidates
 top5 = sorted(ranked_candidates, key=lambda x: x["Score"], reverse=True)[:5]
 
 df_top5 = pd.DataFrame(top5)
