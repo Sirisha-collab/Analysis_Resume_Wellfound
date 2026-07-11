@@ -14,9 +14,7 @@ from extract_service import (
 from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 
-# -----------------------------
 # SPEED OPTIMIZATION
-# -----------------------------
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -24,15 +22,9 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 nlp = spacy.load("en_core_web_lg")
 
-# -----------------------------
-# CONFIG
-# -----------------------------
 RESUME_FOLDER = r"D:\Docs Latest\A Masters Required doc\Projects\Resumes Wellfound\Resumes SDR"
 JOB_DESCRIPTION_FILE = r"D:\Docs Latest\A Masters Required doc\Projects\Resumes Wellfound\Resumes SDR\job description.txt"
 
-# -----------------------------
-# LOAD JD + EMBEDDING
-# -----------------------------
 with open(JOB_DESCRIPTION_FILE, "r", encoding="utf-8") as f:
     job_description = f.read()
 
@@ -80,9 +72,7 @@ def style_excel(file_path):
     wb.save(file_path)
 
 
-# -----------------------------
 # SCORING FUNCTION
-# -----------------------------
 def score_candidate(r, job_embedding):
 
     score = 0
