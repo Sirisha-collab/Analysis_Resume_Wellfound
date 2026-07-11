@@ -174,11 +174,6 @@ def score_candidate(r):
         score += 30
         reasons.append("Full-stack capability")
 
-    # Cloud / deployment bonus
-    if any(x in skills_text for x in ["aws", "azure", "gcp"]):
-        score += 10
-        reasons.append("Cloud experience")
-
     if "git" in skills_text:
         score += 10
         reasons.append("Git experience")
@@ -187,10 +182,6 @@ def score_candidate(r):
     if extract_metrics(r):
         score += 20
         reasons.append(" ")
-
-    # Profile signals
-    score += 10
-    reasons.append(" ")
 
     # Apply skill penalties
     for skill, penalty in PENALTIES.items():
@@ -206,7 +197,7 @@ def score_candidate(r):
             reasons.append(f"{skill} (-70)")
             negative_skills.append(f"{skill}: -70")
 
-    # Final quality gate
+    # Final 
     if score < 70:
         negative_reason = ""
         if negative_skills:
@@ -214,16 +205,12 @@ def score_candidate(r):
     
     return score, "; ".join(reasons), ", ".join(negative_skills)
 
-# -----------------------------
-# CSV ONLY PIPELINE
-# -----------------------------
 
+# CSV ONLY PIPELINE
 all_candidates = []
 ranked_candidates = []
 
 print("Reading CSV:", CSV_FILE)
-
-
 try:
     df = pd.read_csv(
         CSV_FILE,
@@ -246,7 +233,6 @@ print("CSV loaded successfully")
 print("Total applicants:", len(df))
 
 for _, row_data in df.iterrows():
-
     row = {
         "name": row_data.get("name", ""),
         "Email": row_data.get("Email", ""),
@@ -272,17 +258,13 @@ for _, row_data in df.iterrows():
     row["Negative Penalty"] = negative_penalty
 
     ranked_candidates.append(row)
-
-
 # -----------------------------
 # EXPORT RESULTS
 # -----------------------------
-
 SE_DIR = "SE_results"
 os.makedirs(SE_DIR, exist_ok=True)
 
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-
 
 # Complete CSV repository
 df_all = pd.DataFrame(all_candidates)
@@ -296,7 +278,6 @@ df_all.to_excel(repo_file, index=False)
 style_excel(repo_file)
 
 print("Candidate repo saved:", repo_file)
-
 
 # Top 50 candidates
 top50 = sorted(
